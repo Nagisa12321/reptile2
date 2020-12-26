@@ -34,7 +34,7 @@ public class Spider {
 
             //遍历首页章节链接, 进行处理
             for (Element link : links) {
-                String downLoadAddress = "./src/main/resources/少女终末旅行/";
+                String downLoadAddress = "./src/main/resources/约定的梦幻岛/";
 
                 String tailURL = link.attr("href");
 
@@ -115,7 +115,7 @@ public class Spider {
 
     public static void main(String[] args) {
         LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log","org.apache.commons.logging.impl.NoOpLog");
-        spider(basicURL + "/335bz/");
+        spider(basicURL + "/83bz/");
         pool.shutdown();
     }
 }
