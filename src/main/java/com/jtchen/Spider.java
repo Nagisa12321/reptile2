@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 public class Spider {
 
     private static final String basicURL = "http://www.mangabz.com";
-    private static final ExecutorService pool = Executors.newFixedThreadPool(8);
+    private static final ExecutorService pool = Executors.newFixedThreadPool(24);
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void spider(String url) {
@@ -34,7 +34,7 @@ public class Spider {
 
             //遍历首页章节链接, 进行处理
             for (Element link : links) {
-                String downLoadAddress = "./src/main/resources/约定的梦幻岛/";
+                String downLoadAddress = "./src/main/resources/进击的巨人/";
 
                 String tailURL = link.attr("href");
 
@@ -115,7 +115,7 @@ public class Spider {
 
     public static void main(String[] args) {
         LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log","org.apache.commons.logging.impl.NoOpLog");
-        spider(basicURL + "/83bz/");
+        spider(basicURL + "/511bz/");
         pool.shutdown();
     }
 }
