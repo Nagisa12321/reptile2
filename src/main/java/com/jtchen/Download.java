@@ -10,6 +10,7 @@ import org.jsoup.Jsoup;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 /************************************************
  *
@@ -76,18 +77,28 @@ public class Download implements Runnable {
         try {
             System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg");
             HtmlPage page;
-            if (i + 1 == 1) page = webClient.getPage(linkURL);
-            else page = webClient.getPage(linkURL + realTail);
+            while (true){
+                if (i + 1 == 1) page = webClient.getPage(linkURL);
+                else page = webClient.getPage(linkURL + realTail);
+                if(!Objects.equals(page, null)) break;
+            }
+            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg "+page.toString());
             //4.将页面转成指定格式
-            webClient.waitForBackgroundJavaScript(1500);   //等侍js脚本执行完成
+            webClient.waitForBackgroundJavaScript(16432);   //等侍js脚本执行完成
+            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg,网页js执行完毕,正在获取资源...");
 
             String div = page.getElementById("cp_image").toString();
 
-            String pictureURI = Spider.Identify(div, "img src=\"", '?');
+            String pictureURI = Spider.Identify(div, "img src=\"", '"');
+            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg,图片url为:"+pictureURI);
             //下载
             Connection.Response resultImageResponse = Jsoup.connect(pictureURI).ignoreContentType(true).execute();
             FileOutputStream out = new FileOutputStream(realAddress + "/" + (i + 1) + ".jpg");
-            out.write(resultImageResponse.bodyAsBytes());
+            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg,文件流成功打开,开始获取图片二进制流");
+            byte[] data = resultImageResponse.bodyAsBytes();
+            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg,资源已获取到内存,正在写入文件中....");
+            out.write(data);
+            out.flush();
             out.close();
             webClient.closeAllWindows();
             System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg  --->  Succeeded!!O(∩_∩)O");
@@ -95,6 +106,7 @@ public class Download implements Runnable {
             System.err.println(realAddress + " " + (i + 1) + " P下载出现IO问题, 重新下载");
             sourceDownLoad(realTail, i);
         }
+
     }
 
     /* 通过 XXP.jpg 获取第几p */
