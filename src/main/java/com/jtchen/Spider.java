@@ -1,5 +1,6 @@
 package com.jtchen;
 
+import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,17 +19,11 @@ import java.util.concurrent.Executors;
 public class Spider {
 
     private static final String basicURL = "http://www.mangabz.com";
-    private static final ExecutorService pool = Executors.newFixedThreadPool(50);
+    private static final ExecutorService pool = Executors.newFixedThreadPool(8);
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void spider(String url) {
         try {
-            /*//1.创建连接client
-            WebClient webClient = new WebClient(BrowserVersion.CHROME);
-            //2.设置连接的相关选项
-            webClient.getOptions().setCssEnabled(false);
-            webClient.getOptions().setJavaScriptEnabled(true);  //需要解析js
-            webClient.getOptions().setThrowExceptionOnScriptError(false);  //解析js出错时不抛异常
-            webClient.getOptions().setTimeout(10000);  //超时时间  ms*/
 
             Document doc = Jsoup.connect(url)
                     /*.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", 1080)))*/
@@ -39,7 +34,7 @@ public class Spider {
 
             //遍历首页章节链接, 进行处理
             for (Element link : links) {
-                String downLoadAddress = "./src/main/resources/一拳超人/";
+                String downLoadAddress = "./src/main/resources/少女终末旅行/";
 
                 String tailURL = link.attr("href");
 
@@ -59,25 +54,8 @@ public class Spider {
 
                 //进入链接, 下载图片
 
-                for (int i = 0; i < Ps; i++) {
-
-                    String realTail = "#ipg" + (i + 1);
-                    /* htmlunit */
-                    /*//3.抓取页面
-                    HtmlPage page;
-                    if (i == 0) page = webClient.getPage(linkURL);
-                    else page = webClient.getPage(linkURL + realTail);
-                    //4.将页面转成指定格式
-                    webClient.waitForBackgroundJavaScript(1000);   //等侍js脚本执行完成
-
-                    String div = page.getElementById("cp_image").toString();
-
-                    String pictureURI = Identify(div, "img src=\"", '?');*/
-                    //下载
-
-                    pool.submit(new Download(realAddress, linkURL, realTail, i + 1));
-                    /*new Thread(new Download(realAddress, linkURL, realTail, i + 1)).start();*/
-                }
+                pool.submit(new Download(realAddress, linkURL, Ps));
+                /*new Thread(new Download(realAddress, linkURL, realTail, i + 1)).start();*/
             }
         } catch (IOException e) {
             System.err.println(e.toString() + " 链接服务器失败! ");
@@ -91,8 +69,6 @@ public class Spider {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < src.length(); i++) {
             if (src.charAt(i) == end && isWriting) {
-                isWriting = false;
-
                 //处理builder
                 return builder.toString();
             }
@@ -138,7 +114,8 @@ public class Spider {
     }
 
     public static void main(String[] args) {
-        spider(basicURL + "/38bz/");
+        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log","org.apache.commons.logging.impl.NoOpLog");
+        spider(basicURL + "/335bz/");
         pool.shutdown();
     }
 }
