@@ -1,6 +1,7 @@
 package com.jtchen.spider;
 
 import com.jtchen.download.Download;
+import com.jtchen.tool.Pair;
 import com.jtchen.tool.UrlTool;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -8,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +25,25 @@ public class Spider {
 
     private static final String basicURL = "http://www.mangabz.com";
     private static final ExecutorService pool = Executors.newFixedThreadPool(24);
+
     private static String name;
+
+    private static String basicAddress = "./src/main/resources";
+
+    private static JTextArea area;
+
+    public static void setBasicAddress(String basicAddress) {
+        Spider.basicAddress = basicAddress;
+    }
+
+
+    public static void setName(String name) {
+        Spider.name = name;
+    }
+
+    public static void setArea(JTextArea area) {
+        Spider.area = area;
+    }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void spider(String url) {
@@ -38,7 +58,7 @@ public class Spider {
 
             //遍历首页章节链接, 进行处理
             for (Element link : links) {
-                String downLoadAddress = "./src/main/resources/" + name + "/";
+                String downLoadAddress = basicAddress + "/" + name + "/";
 
                 String tailURL = link.attr("href");
 
@@ -58,7 +78,7 @@ public class Spider {
 
                 //进入链接, 下载图片
 
-                pool.submit(new Download(realAddress, linkURL, Ps));
+                pool.submit(new Download(realAddress, linkURL, Ps, area));
                 /*new Thread(new Download(realAddress, linkURL, realTail, i + 1)).start();*/
             }
         } catch (IOException e) {
@@ -68,10 +88,8 @@ public class Spider {
 
 
     public static void main(String[] args) {
-        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log","org.apache.commons.logging.impl.NoOpLog");
-
-
-        System.out.println("请选择你要的模式:");
+        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+        System.out.println("===请选择你要的模式:===");
         System.out.println("1. 疯狂爬取");
         System.out.println("2. 搜索爬取");
         int in = new Scanner(System.in).nextInt();
@@ -80,8 +98,17 @@ public class Spider {
         } else if (in == 2) {
             System.out.println("输入你想要的漫画");
             name = new Scanner(System.in).next();
-            String nameTail = Search.searchFromHomePage(name);
-            spider(basicURL + nameTail);
+            Pair[] pairs = Search.searchFromHomePage(name);
+
+            System.out.println("===搜索结果如下===");
+            for (int i = 0; i < pairs.length; i++) {
+                System.out.println(i + ". " + pairs[i].getName());
+            }
+            System.out.println("请输入你要下载的序号");
+            int idx = new Scanner(System.in).nextInt();
+            if (idx >= pairs.length)
+                System.err.println("输入序号有误");
+            else spider(basicURL + pairs[idx].getBz());
 
         } else {
             System.err.println("输入的不是1或2, 程序退出");

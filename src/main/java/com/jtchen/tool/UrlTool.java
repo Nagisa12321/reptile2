@@ -58,4 +58,8 @@ public class UrlTool {
         }
         return builder.toString();
     }
+
+    public static String cutAddress(String add) {
+        return add.substring(add.lastIndexOf('/'));
+    }
 }

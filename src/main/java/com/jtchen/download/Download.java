@@ -9,25 +9,27 @@ import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
 /************************************************
- *
  * @author jtchen
  * @date 2020/12/26 0:54
  * @version 1.0
  ************************************************/
 public class Download implements Runnable {
 
+    private final JTextArea area;
     private final String linkURL;
     private final String realAddress;
     private final int p;
     private WebClient webClient;
 
-    public Download(String realAddress, String linkURL, int p) {
+    public Download(String realAddress, String linkURL, int p, JTextArea area) {
+        this.area = area;
         this.linkURL = linkURL;
         this.realAddress = realAddress;
         this.p = p;
@@ -51,8 +53,11 @@ public class Download implements Runnable {
         }
 
         File[] files = new File(realAddress).listFiles();
-        if (files.length == p) System.out.println("======文件完整, 线程结束!=======");
-        else {
+        if (files.length == p) {
+            System.out.println("======文件完整, 线程结束!=======");
+            area.append(UrlTool.cutAddress(realAddress) + " 下载成功 ヾ(≧▽≦*)o\n");
+            area.setCaretPosition(area.getText().length());
+        } else {
             System.err.println("======文件不完整, 重新检查!=======");
             while (true) {
                 files = new File(realAddress).listFiles();
@@ -103,7 +108,8 @@ public class Download implements Runnable {
             out.flush();
             out.close();
             webClient.closeAllWindows();
-            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg  --->  Succeeded!!O(∩_∩)O");
+            System.out.println("downloading.. " + realAddress
+                    + "/" + (i + 1) + ".jpg  --->  Succeeded!!O(∩_∩)O");
         } catch (IOException e) {
             System.err.println(realAddress + " " + (i + 1) + " P下载出现IO问题, 重新下载");
             sourceDownLoad(realTail, i);

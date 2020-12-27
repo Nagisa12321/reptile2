@@ -5,13 +5,15 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
+import com.jtchen.tool.Pair;
 import com.jtchen.tool.UrlTool;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 
 /************************************************
- *
  * @author jtchen
  * @date 2020/12/27 13:07
  * @version 1.0
@@ -19,8 +21,8 @@ import java.io.IOException;
 public class Search {
     private static final String basicURL = "http://www.mangabz.com";
 
-    public static String searchFromHomePage(String s) {
-        String res = "";
+    public static Pair[] searchFromHomePage(String s) {
+        Pair[] pairs = null;
         //1.创建连接client
         try {
             System.out.println("浏览器正在启动...");
@@ -38,11 +40,18 @@ public class Search {
             HtmlTextInput textInput = page.getHtmlElementById("txtKeywords");
             textInput.setText(s);
             page = input.click();
-            String tmp = page.getByXPath("//div[@class='mh-item'][1]/a").get(0).toString();
-            res = UrlTool.Identify(tmp, "href=\"", '"');
+            List<?> BZList = page.getByXPath("//div[@class='mh-item'][1]/a");
+
+            pairs = new Pair[BZList.size()];
+            var map = new HashMap<String, String>();
+            for (int i = 0; i < BZList.size(); i++) {
+                String bz = page.getByXPath("//div[@class='mh-item'][1]/a").get(i).toString();
+                String name = page.getByXPath("//div[@class='mh-item-detali'][1]/h2/a").get(i).toString();
+                pairs[i] = new Pair(UrlTool.Identify(bz, "href=\"", '"'), UrlTool.Identify(name, "title=\"", '"'));
+            }
         } catch (IOException e) {
             System.err.println(e.toString());
         }
-        return res;
+        return pairs;
     }
 }
