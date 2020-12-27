@@ -10,7 +10,6 @@ import com.jtchen.tool.UrlTool;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 /************************************************
@@ -43,7 +42,6 @@ public class Search {
             List<?> BZList = page.getByXPath("//div[@class='mh-item'][1]/a");
 
             pairs = new Pair[BZList.size()];
-            var map = new HashMap<String, String>();
             for (int i = 0; i < BZList.size(); i++) {
                 String bz = page.getByXPath("//div[@class='mh-item'][1]/a").get(i).toString();
                 String name = page.getByXPath("//div[@class='mh-item-detali'][1]/h2/a").get(i).toString();

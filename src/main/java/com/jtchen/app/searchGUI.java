@@ -3,14 +3,10 @@ package com.jtchen.app;
 import com.jtchen.spider.Search;
 import com.jtchen.spider.Spider;
 import com.jtchen.tool.Pair;
-import com.jtchen.tool.UrlTool;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings("ALL")
 public class searchGUI extends JDialog implements Runnable {
     private static final String basicURL = "http://www.mangabz.com";
     private Pair[] pairs;
@@ -59,18 +55,17 @@ public class searchGUI extends JDialog implements Runnable {
             }
         });
         downloadButton.addActionListener(e -> {
-            searchButton.setEnabled(false);
             browseButton.setEnabled(false);
             int idx = list1.getSelectedIndex();
             Console.append("开始下载...\n");
             String cartonName = pairs[idx].getName();
             String cartonBasicDir = textArea2.getText();
 
-            new Thread(new Spider(cartonBasicDir,cartonName,basicURL + pairs[idx].getBz(),Console)).start();
+            Spider spider = new Spider(cartonBasicDir,cartonName,basicURL + pairs[idx].getBz(),Console);
+            spider.setButton(downloadButton);
+            new Thread(spider).start();
+            downloadButton.setEnabled(false);
 
-            List<String> errorMessage = UrlTool.checkFile(cartonBasicDir + "\\" + cartonName);
-            for(int i = 0;i<errorMessage.size();++i)
-                Console.append(errorMessage.get(i)+"\n");
         });
     }
 

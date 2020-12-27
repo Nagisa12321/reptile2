@@ -13,8 +13,4 @@ import static org.junit.Assert.*;
 
 public class DownloadTest {
 
-    @Test
-    public static void main(String[] args) {
-
-    }
 }

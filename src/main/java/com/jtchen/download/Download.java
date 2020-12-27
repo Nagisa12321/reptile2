@@ -3,7 +3,6 @@ package com.jtchen.download;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.jtchen.spider.Spider;
 import com.jtchen.tool.UrlTool;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
@@ -20,6 +19,7 @@ import java.util.Objects;
  * @date 2020/12/26 0:54
  * @version 1.0
  ************************************************/
+@SuppressWarnings("ConditionalBreakInInfiniteLoop")
 public class Download implements Runnable {
 
     private final JTextArea area;
@@ -53,6 +53,7 @@ public class Download implements Runnable {
         }
 
         File[] files = new File(realAddress).listFiles();
+        assert files != null;
         if (files.length == p) {
             System.out.println("======文件完整, 线程结束!=======");
             area.append(UrlTool.cutAddress(realAddress) + " 下载成功 ヾ(≧▽≦*)o\n");
@@ -61,6 +62,7 @@ public class Download implements Runnable {
             System.err.println("======文件不完整, 重新检查!=======");
             while (true) {
                 files = new File(realAddress).listFiles();
+                assert files != null;
                 if (files.length == p) break;
                 int[] map = new int[p];
                 for (File file : files) {

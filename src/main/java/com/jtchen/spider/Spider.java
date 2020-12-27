@@ -1,9 +1,7 @@
 package com.jtchen.spider;
 
 import com.jtchen.download.Download;
-import com.jtchen.tool.Pair;
 import com.jtchen.tool.UrlTool;
-import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,7 +9,7 @@ import org.jsoup.select.Elements;
 
 import javax.swing.*;
 import java.io.*;
-import java.util.Scanner;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -22,26 +20,31 @@ import java.util.concurrent.TimeUnit;
  * @date 2020/12/25 21:34
  * @version 1.0
  ************************************************/
+@SuppressWarnings("ForLoopReplaceableByForEach")
 public class Spider implements Runnable {
 
-    private final String basicURL = "http://www.mangabz.com";
     private final ExecutorService pool = Executors.newFixedThreadPool(20);
 
-    private String name;
-    private String url;
-    private String basicAddress = "./src/main/resources";
+    private final String name;
+    private final String url;
+    private final String basicAddress;
 
-    private JTextArea area;
+    private JButton button;
+
+    private final JTextArea area;
 
 
-
-    public Spider(String basicAddress, String name,String url ,JTextArea area) {
+    public Spider(String basicAddress, String name, String url, JTextArea area) {
         this.basicAddress = basicAddress;
         this.name = name;
         this.area = area;
         this.url = url;
     }
 
+
+    public void setButton(JButton button) {
+        this.button = button;
+    }
 
     @Override
     public void run() {
@@ -50,7 +53,7 @@ public class Spider implements Runnable {
 
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private  void spider() {
+    private void spider() {
         try {
 
             Document doc = Jsoup.connect(url)
@@ -67,6 +70,7 @@ public class Spider implements Runnable {
                 String tailURL = link.attr("href");
 
                 //各章链接URL
+                String basicURL = "http://www.mangabz.com";
                 String linkURL = basicURL + tailURL;
                 //每章标题
                 String rawTitle = UrlTool.Identify(link.toString(), "target=\"_blank\">", '<');
@@ -87,42 +91,19 @@ public class Spider implements Runnable {
             }
             pool.shutdown();
             pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+
+            area.append("下载任务已完成 ~\n");
+            List<String> errorMessage = UrlTool.checkFile(basicAddress + "\\" + name);
+
+            for (int i = 0; i < errorMessage.size(); ++i)
+                area.append(errorMessage.get(i) + "\n");
+
+            button.setEnabled(true);
         } catch (IOException e) {
             System.err.println(e.toString() + " 链接服务器失败! ");
         } catch (InterruptedException e) {
             System.err.println(e.toString());
         }
     }
-
-
-    public static void main(String[] args) {
-        /*LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
-        System.out.println("===请选择你要的模式:===");
-        System.out.println("1. 疯狂爬取");
-        System.out.println("2. 搜索爬取");
-        int in = new Scanner(System.in).nextInt();
-        if (in == 1) {
-
-        } else if (in == 2) {
-            System.out.println("输入你想要的漫画");
-            name = new Scanner(System.in).next();
-            Pair[] pairs = Search.searchFromHomePage(name);
-
-            System.out.println("===搜索结果如下===");
-            for (int i = 0; i < pairs.length; i++) {
-                System.out.println(i + ". " + pairs[i].getName());
-            }
-            System.out.println("请输入你要下载的序号");
-            int idx = new Scanner(System.in).nextInt();
-            if (idx >= pairs.length)
-                System.err.println("输入序号有误");
-            else spider(basicURL + pairs[idx].getBz());
-
-        } else {
-            System.err.println("输入的不是1或2, 程序退出");
-        }
-        pool.shutdown();*/
-    }
-
 
 }

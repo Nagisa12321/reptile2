@@ -3,6 +3,7 @@ package com.jtchen.tool;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /************************************************
  *
@@ -12,15 +13,16 @@ import java.util.List;
  ************************************************/
 public class UrlTool {
     //检查所有文件完整性
-    public static List<String> checkFile(String Dir){
+    public static List<String> checkFile(String Dir) {
         List<String> error = new ArrayList<>();
         File[] subDir = new File(Dir).listFiles();
-        for(File dir:subDir){
+        assert subDir != null;
+        for (File dir : subDir) {
             String dirName = dir.toString();
-            String CountStr = dirName.substring(dirName.lastIndexOf('(')+1,dirName.lastIndexOf(')'));
+            String CountStr = dirName.substring(dirName.lastIndexOf('(') + 1, dirName.lastIndexOf(')'));
             int count = Integer.parseInt(CountStr);
-            if(count!=dir.listFiles().length)
-                error.add(dirName+" ->不完整，请好好检查O(∩_∩)O");
+            if (count != Objects.requireNonNull(dir.listFiles()).length)
+                error.add(dirName + " ->不完整，请好好检查O(∩_∩)O");
 
         }
         return error;
