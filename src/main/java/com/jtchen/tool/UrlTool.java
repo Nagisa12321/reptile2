@@ -1,6 +1,8 @@
 package com.jtchen.tool;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /************************************************
  *
@@ -10,19 +12,18 @@ import java.io.File;
  ************************************************/
 public class UrlTool {
     //检查所有文件完整性
-    public static boolean checkFile(String Dir){
-        boolean ok = true;
+    public static List<String> checkFile(String Dir){
+        List<String> error = new ArrayList<>();
         File[] subDir = new File(Dir).listFiles();
         for(File dir:subDir){
             String dirName = dir.toString();
             String CountStr = dirName.substring(dirName.lastIndexOf('(')+1,dirName.lastIndexOf(')'));
             int count = Integer.parseInt(CountStr);
-            if(count!=dir.listFiles().length){
-                ok = false;
-                System.err.println(dirName+" ->不完整，请好好检查O(∩_∩)O");
-            }
+            if(count!=dir.listFiles().length)
+                error.add(dirName+" ->不完整，请好好检查O(∩_∩)O");
+
         }
-        return ok;
+        return error;
     }
 
     //解析一个标题

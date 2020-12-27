@@ -8,6 +8,7 @@ import com.jtchen.tool.UrlTool;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class searchGUI extends JDialog implements Runnable {
@@ -64,11 +65,12 @@ public class searchGUI extends JDialog implements Runnable {
             Console.append("开始下载...\n");
             String cartonName = pairs[idx].getName();
             String cartonBasicDir = textArea2.getText();
-            Spider.setBasicAddress(cartonBasicDir);
-            Spider.setName(cartonName);
-            Spider.setArea(Console);
-            Spider.spider(basicURL + pairs[idx].getBz());
-            UrlTool.checkFile(cartonBasicDir + "\\" + cartonName);
+
+            new Thread(new Spider(cartonBasicDir,cartonName,basicURL + pairs[idx].getBz(),Console)).start();
+
+            List<String> errorMessage = UrlTool.checkFile(cartonBasicDir + "\\" + cartonName);
+            for(int i = 0;i<errorMessage.size();++i)
+                Console.append(errorMessage.get(i)+"\n");
         });
     }
 
