@@ -1,5 +1,9 @@
 package com.jtchen.tool;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 /************************************************
  *
  * @author jtchen
@@ -7,6 +11,21 @@ package com.jtchen.tool;
  * @version 1.0
  ************************************************/
 public class UrlTool {
+    //检查所有文件完整性
+    public static List<String> checkFile(String Dir){
+        List<String> error = new ArrayList<>();
+        File[] subDir = new File(Dir).listFiles();
+        for(File dir:subDir){
+            String dirName = dir.toString();
+            String CountStr = dirName.substring(dirName.lastIndexOf('(')+1,dirName.lastIndexOf(')'));
+            int count = Integer.parseInt(CountStr);
+            if(count!=dir.listFiles().length)
+                error.add(dirName+" ->不完整，请好好检查O(∩_∩)O");
+
+        }
+        return error;
+    }
+
     //解析一个标题
     public static String Identify(String src, String startWith, char end) {
         int idx = 0;

@@ -46,7 +46,7 @@ public class Download implements Runnable {
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(true);  //需要解析js
         webClient.getOptions().setThrowExceptionOnScriptError(false);  //解析js出错时不抛异常
-        webClient.getOptions().setTimeout(20000);  //超时时间  ms
+        webClient.getOptions().setTimeout(22000);  //超时时间  ms
         for (int i = 0; i < p; i++) {
             String realTail = "#ipg" + (i + 1);
             sourceDownLoad(realTail, i);

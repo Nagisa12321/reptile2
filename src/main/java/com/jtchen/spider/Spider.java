@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /************************************************
  *
@@ -21,32 +22,35 @@ import java.util.concurrent.Executors;
  * @date 2020/12/25 21:34
  * @version 1.0
  ************************************************/
-public class Spider {
+public class Spider implements Runnable {
 
-    private static final String basicURL = "http://www.mangabz.com";
-    private static final ExecutorService pool = Executors.newFixedThreadPool(24);
+    private final String basicURL = "http://www.mangabz.com";
+    private final ExecutorService pool = Executors.newFixedThreadPool(20);
 
-    private static String name;
+    private String name;
+    private String url;
+    private String basicAddress = "./src/main/resources";
 
-    private static String basicAddress = "./src/main/resources";
+    private JTextArea area;
 
-    private static JTextArea area;
 
-    public static void setBasicAddress(String basicAddress) {
-        Spider.basicAddress = basicAddress;
+
+    public Spider(String basicAddress, String name,String url ,JTextArea area) {
+        this.basicAddress = basicAddress;
+        this.name = name;
+        this.area = area;
+        this.url = url;
     }
 
 
-    public static void setName(String name) {
-        Spider.name = name;
+    @Override
+    public void run() {
+        spider();
     }
 
-    public static void setArea(JTextArea area) {
-        Spider.area = area;
-    }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void spider(String url) {
+    private  void spider() {
         try {
 
             Document doc = Jsoup.connect(url)
@@ -81,14 +85,18 @@ public class Spider {
                 pool.submit(new Download(realAddress, linkURL, Ps, area));
                 /*new Thread(new Download(realAddress, linkURL, realTail, i + 1)).start();*/
             }
+            pool.shutdown();
+            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
         } catch (IOException e) {
             System.err.println(e.toString() + " 链接服务器失败! ");
+        } catch (InterruptedException e) {
+            System.err.println(e.toString());
         }
     }
 
 
     public static void main(String[] args) {
-        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+        /*LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
         System.out.println("===请选择你要的模式:===");
         System.out.println("1. 疯狂爬取");
         System.out.println("2. 搜索爬取");
@@ -113,6 +121,8 @@ public class Spider {
         } else {
             System.err.println("输入的不是1或2, 程序退出");
         }
-        pool.shutdown();
+        pool.shutdown();*/
     }
+
+
 }
