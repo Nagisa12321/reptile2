@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /************************************************
  *
@@ -24,13 +25,15 @@ import java.util.concurrent.Executors;
 public class Spider {
 
     private static final String basicURL = "http://www.mangabz.com";
-    private static final ExecutorService pool = Executors.newFixedThreadPool(24);
+    private static final ExecutorService pool = Executors.newFixedThreadPool(20);
 
     private static String name;
 
     private static String basicAddress = "./src/main/resources";
 
     private static JTextArea area;
+
+
 
     public static void setBasicAddress(String basicAddress) {
         Spider.basicAddress = basicAddress;
@@ -81,8 +84,12 @@ public class Spider {
                 pool.submit(new Download(realAddress, linkURL, Ps, area));
                 /*new Thread(new Download(realAddress, linkURL, realTail, i + 1)).start();*/
             }
+            pool.shutdown();
+            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
         } catch (IOException e) {
             System.err.println(e.toString() + " 链接服务器失败! ");
+        }catch (InterruptedException e){
+            System.err.println(e.toString());
         }
     }
 

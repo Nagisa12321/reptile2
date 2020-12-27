@@ -7,8 +7,8 @@ package com.jtchen.tool;
  * @version 1.0
  ************************************************/
 public class Pair {
-    private final String bz;
-    private final String name;
+    private final String bz; // eg. /551bz/
+    private final String name; //eg.  干物妹小埋
 
     public Pair(String bz, String name) {
         this.bz = bz;
