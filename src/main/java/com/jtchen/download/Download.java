@@ -1,8 +1,10 @@
-package com.jtchen;
+package com.jtchen.download;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.jtchen.spider.Spider;
+import com.jtchen.tool.UrlTool;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -53,7 +55,7 @@ public class Download implements Runnable {
         else {
             System.err.println("======文件不完整, 重新检查!=======");
             while (true) {
-                files =  new File(realAddress).listFiles();
+                files = new File(realAddress).listFiles();
                 if (files.length == p) break;
                 int[] map = new int[p];
                 for (File file : files) {
@@ -77,20 +79,20 @@ public class Download implements Runnable {
         try {
             System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg");
             HtmlPage page;
-            while (true){
+            while (true) {
                 if (i + 1 == 1) page = webClient.getPage(linkURL);
                 else page = webClient.getPage(linkURL + realTail);
-                if(!Objects.equals(page, null)) break;
+                if (!Objects.equals(page, null)) break;
             }
-            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg "+page.toString());
+            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg " + page.toString());
             //4.将页面转成指定格式
             webClient.waitForBackgroundJavaScript(16432);   //等侍js脚本执行完成
             System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg,网页js执行完毕,正在获取资源...");
 
             String div = page.getElementById("cp_image").toString();
 
-            String pictureURI = Spider.Identify(div, "img src=\"", '"');
-            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg,图片url为:"+pictureURI);
+            String pictureURI = UrlTool.Identify(div, "img src=\"", '"');
+            System.out.println("downloading.. " + realAddress + "/" + (i + 1) + ".jpg,图片url为:" + pictureURI);
             //下载
             Connection.Response resultImageResponse = Jsoup.connect(pictureURI).ignoreContentType(true).execute();
             FileOutputStream out = new FileOutputStream(realAddress + "/" + (i + 1) + ".jpg");

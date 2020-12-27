@@ -1,5 +1,7 @@
-package com.jtchen;
+package com.jtchen.spider;
 
+import com.jtchen.download.Download;
+import com.jtchen.tool.UrlTool;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -7,6 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,6 +23,7 @@ public class Spider {
 
     private static final String basicURL = "http://www.mangabz.com";
     private static final ExecutorService pool = Executors.newFixedThreadPool(24);
+    private static String name;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void spider(String url) {
@@ -34,18 +38,18 @@ public class Spider {
 
             //遍历首页章节链接, 进行处理
             for (Element link : links) {
-                String downLoadAddress = "./src/main/resources/进击的巨人/";
+                String downLoadAddress = "./src/main/resources/" + name + "/";
 
                 String tailURL = link.attr("href");
 
                 //各章链接URL
                 String linkURL = basicURL + tailURL;
                 //每章标题
-                String rawTitle = Identify(link.toString(), "target=\"_blank\">", '<');
-                String title = RemoveSpaces(rawTitle);
+                String rawTitle = UrlTool.Identify(link.toString(), "target=\"_blank\">", '<');
+                String title = UrlTool.RemoveSpaces(rawTitle);
 
                 //创建文件夹
-                int Ps = Integer.parseInt(Identify(link.toString(), "<span>（", 'P'));
+                int Ps = Integer.parseInt(UrlTool.Identify(link.toString(), "<span>（", 'P'));
 
                 String realAddress = downLoadAddress + title + "(" + Ps + ")";
                 var fi = new File(realAddress);
@@ -62,60 +66,26 @@ public class Spider {
         }
     }
 
-    //解析一个标题
-    public static String Identify(String src, String startWith, char end) {
-        int idx = 0;
-        boolean isWriting = false;
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < src.length(); i++) {
-            if (src.charAt(i) == end && isWriting) {
-                //处理builder
-                return builder.toString();
-            }
-
-            if (isWriting) {
-                builder.append(src.charAt(i));
-            }
-            if (src.charAt(i) == startWith.charAt(idx)) idx++;
-            else idx = 0;
-
-            if (idx == startWith.length()) {
-                //设置为可写
-                isWriting = true;
-                idx = 0;
-            }
-        }
-        return "";
-    }
-
-    /* 去掉文件名开头、结尾的空格、特殊符号 */
-    public static String RemoveSpaces(String s) {
-        int idx = 0;
-        for (int i = 0; i < s.length(); i++)
-            if (s.charAt(i) == ' ') idx++;
-            else break;
-        s = idx == 0 ? s : s.substring(idx);
-        idx = s.length() - 1;
-        for (int i = s.length() - 1; i >= 0; i--) {
-            if (s.charAt(i) == ' ') idx--;
-            else break;
-        }
-        s = idx == s.length() - 1 ? s : s.substring(0, idx + 1);
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) != '"'
-                    && s.charAt(i) != '?'
-                    && s.charAt(i) != '\\'
-                    && s.charAt(i) != '/'
-                    && s.charAt(i) != ':')
-                builder.append(s.charAt(i));
-        }
-        return builder.toString();
-    }
 
     public static void main(String[] args) {
         LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log","org.apache.commons.logging.impl.NoOpLog");
-        spider(basicURL + "/511bz/");
+
+
+        System.out.println("请选择你要的模式:");
+        System.out.println("1. 疯狂爬取");
+        System.out.println("2. 搜索爬取");
+        int in = new Scanner(System.in).nextInt();
+        if (in == 1) {
+
+        } else if (in == 2) {
+            System.out.println("输入你想要的漫画");
+            name = new Scanner(System.in).next();
+            String nameTail = Search.searchFromHomePage(name);
+            spider(basicURL + nameTail);
+
+        } else {
+            System.err.println("输入的不是1或2, 程序退出");
+        }
         pool.shutdown();
     }
 }
