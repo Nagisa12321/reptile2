@@ -5,10 +5,12 @@ import com.jtchen.spider.Spider;
 import com.jtchen.tool.Pair;
 
 import javax.swing.*;
+import java.awt.*;
 
 @SuppressWarnings("ALL")
 public class searchGUI extends JDialog implements Runnable {
     private static final String basicURL = "http://www.mangabz.com";
+    private Frame theFrame;
     private Pair[] pairs;
     private JPanel contentPane;
     private JList list1;
@@ -48,7 +50,7 @@ public class searchGUI extends JDialog implements Runnable {
             chooser.setMultiSelectionEnabled(false);
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             chooser.setDialogTitle("选择『下载』文件夹");
-            int result = chooser.showOpenDialog(this);
+            int result = chooser.showOpenDialog(theFrame);
             if (result == JFileChooser.APPROVE_OPTION) {
                 String filepath = chooser.getSelectedFile().getAbsolutePath();
                 textArea2.setText(filepath);

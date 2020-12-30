@@ -4,6 +4,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 import org.apache.commons.logging.LogFactory;
 
 import javax.swing.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 /************************************************
  *
@@ -19,6 +21,12 @@ public class select {
 
     public select() {
         button1.addActionListener(e -> new Thread(new searchGUI()).start());
+        button1.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+            }
+        });
     }
 
     public static void main(String[] args) {
@@ -28,7 +36,8 @@ public class select {
         frame.setContentPane(new select().root);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
-        frame.setLocation(400, 500);
+        frame.setLocation(400, 200);
         frame.setVisible(true);
+        frame.setAlwaysOnTop(true);
     }
 }
